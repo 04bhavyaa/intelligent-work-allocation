@@ -1,0 +1,42 @@
+# Environment
+.env
+*.env
+.venv/
+src/
+*.pdf
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Logs
+logs/*.log
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Database
+# *.db
+*.sqlite
+*.sqlite3
+
+# OS
+.DS_Store
+Thumbs.db

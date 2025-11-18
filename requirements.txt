@@ -1,0 +1,10 @@
+langchain
+langchain-google-genai
+langgraph
+google-generativeai
+python-dotenv
+pydantic
+pandas
+# sqlite3
+typing-extensions
+ipykernel
