@@ -1,10 +1,20 @@
+strands-agents
+boto3
+botocore
+mysql-connector-python
+pymysql
+SQLAlchemy
+pandas
+numpy
+pydantic
+python-dotenv
+jupyter
+ipykernel
+python-dateutil
+pytz
+colorama
 langchain
 langchain-google-genai
-langgraph
 google-generativeai
-python-dotenv
-pydantic
-pandas
-# sqlite3
-typing-extensions
-ipykernel
+strands-agents[gemini]
+strands-agents-tools

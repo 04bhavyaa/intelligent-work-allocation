@@ -1,9 +1,6 @@
 # Environment
 .env
 *.env
-.venv/
-src/
-*.pdf
 
 # Python
 __pycache__/
@@ -12,7 +9,7 @@ __pycache__/
 *.so
 .Python
 env/
-venv/
+.venv/
 ENV/
 build/
 dist/
@@ -36,6 +33,7 @@ logs/*.log
 # *.db
 *.sqlite
 *.sqlite3
+*.pdf
 
 # OS
 .DS_Store

@@ -1,323 +1,126 @@
-# Intelligent Work Allocation System
-**Clovertex GenAI Internship Assignment**
+# Multi-Agent Work Allocation System
+Note: 
+1st implemented using Langgraph + Gemini API + sqlite3 due to familiarity with the stack and to complete the assignment in one way atleast.
+Then, upon finishing that tried this approach and in the process learnt Strands Agents. 
 
-An AI-powered radiology work allocation system using multi-agent architecture with LangGraph, demonstrating intelligent resource assignment based on expertise, availability, and workload optimization.
+## Tech Stack with Justification:
+- Python + Strands Agents: Modular multi-agent orchestration framework for clear separation of responsibilities.
+- MySQL + PHPMyAdmin + SQLAlchemy: Robust relational database with monitoring and connection pooling support.
+- Gemini API + Bedrock LLMs: For generating human-readable explanations of assignment decisions, with fallback logic.
+- Docker: To run MySQL and phpmyadmin containers.
+- Pandas: For data loading and manipulation from CSV files.
 
----
+## Setup Instructions
+[requirements.txt + docker-compose.yml + work_allocation.sql (phpMyAdmin SQL Dump)]
+- Create a virtual environment: `python -m venv .venv`
+- Activate (Windows): `.venv/Scripts/activate`
+- Install dependencies: `pip install -r requirements.txt`
+- Or for faster execution use uv: `uv init`, `uv venv`, `.venv/Scripts/activate`, `uv pip install -r requirements.txt`
+- Setup database:
+  - Requires MySQL running on port 3307 (default:3306, can edit in docker-compose, .env).
+  - Run `docker-compose up -d` from the project root to start MySQL and PHPMyAdmin (monitoring at port 8080).
+- Environment variables for database and LLM providers. Check sample .env file below.
+- Initialize schema and load CSV data by running `initialize_database(reset=True)`.
+- Set to False if you don't want your database to be recreated everytime the script is run.
+- Run notebook `demo.ipynb` using the virtual environment kernel for full demonstration.
 
-## 📋 Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Technology Stack](#technology-stack)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Architecture](#architecture)
-- [Design Decisions](#design-decisions)
-- [Scoring Logic](#scoring-logic)
-- [Project Structure](#project-structure)
-- [Conclusion](#conclusion)
+**Sample .env**
+- Gemini
+    - GOOGLE_API_KEY=
+    - GEMINI_MODEL=gemini-2.5-flash (I used this model.)
 
----
+- Bedrock
+    - AWS_ACCESS_KEY_ID=
+    - AWS_SECRET_ACCESS_KEY=
+    - AWS_DEFAULT_REGION=
+    - BEDROCK_MODEL_ID=anthropic.claude-3-sonnet-20240229-v1:0
 
-## 🎯 Overview
+- MySQL Database
+    - DB_HOST=localhost
+    - DB_PORT=3307
+    - DB_NAME=work_allocation
+    - DB_USER=work_user
+    - DB_PASSWORD=work_password
 
-This system intelligently assigns radiology work requests to available radiologists using a 5-agent architecture orchestrated with LangGraph. Each agent has a specific responsibility in the assignment workflow, from receiving requests to generating AI-powered explanations for assignments.
+## Design Decisions and Trade-offs
 
-### Key Capabilities
-- **Multi-agent orchestration** using LangGraph StateGraph
-- **Transparent 100-point scoring system** for resource selection
-- **LLM-powered explanations** via Google Gemini API
-- **Database-driven** workflow with SQLite
-- **Production-ready** error handling and transaction management
+- Separation of concerns in notebook cells enhances clarity and modular development:
+    - Cell 1: All Imports
+    - Cell 2: Database Manager (Connection Pooling)
+    - Cell 3: Database Helper Functions
+    - Cell 4: Tool Functions for Agents (Scoring Logic + Other core logics)
+    - Cell 5: LLM Setup with Bedrock Primary + Gemini Fallback
+    - Cell 6: 5 Strands Agents 
+        Agent 1 - AddWorkAgent: Accepts work request → inserts into database → returns work_id
+        Agent 2 - WorkAnalyzerAgent: Analyzes work_id → determines required specialty/role
+        Agent 3 - ResourceFinderAgent: Finds resources matching required specialty
+        Agent 4 - AvailabilityCheckerAgent: Scores candidates based on availability, workload, skill, experience select best match
+        Agent 5 - AssignmentAgent: Updates database + uses LLM to generate explanation of assignment decision
+    - Cell 7: Strands Graph Connecting the 5 Agents
+    - Cell 8: Initialize Database
+    - Cell 9-11: Demonstration of 3 scenerios
+- Used few-shot prompting for LLM reasoning to generate assignment explanations.
+- Scoring components are modular and tunable according to organizational priorities.
+- The agent pipeline approach improves maintainability by separating concerns into distinct agent responsibilities.
+- Used PHPmyadmin and MySQL over sqlite3 because of its ease to monitor the database.
+- Used fallback LLM model to handle primary model outages.
+- Was trying to use Bedrock but turns out it's paid, so used Gemini for Strands Agents however the code is intact for Bedrock.
+- For system_prompts in Strands Agents used to the point and short prompts and instructed the LLM to avoid providing any reasoning for the actions taken, to avoid token usage.
 
----
-
-## ✨ Features
-
-### Core Functionality
-- ✅ 5-agent sequential workflow
-- ✅ Intelligent specialty matching (exact + alternate)
-- ✅ Weighted scoring algorithm (skill, experience, availability, workload)
-- ✅ Priority-based urgent case handling
-- ✅ Real-time availability checking
-- ✅ Workload balancing across resources
-- ✅ AI-generated assignment explanations
-
-### Technical Features
-- ✅ LangGraph state management
-- ✅ SQLite with foreign key constraints
-- ✅ Transaction safety (BEGIN/COMMIT/ROLLBACK)
-- ✅ Comprehensive error handling
-- ✅ Type hints throughout codebase
-- ✅ Modular, extensible design
-
----
-
-## 🛠️ Technology Stack
-
-### Framework & Orchestration
-- **LangGraph** - Agent workflow orchestration
-- **Python 3.8+** - Core language
-
-### LLM Integration
-- **Google Gemini API (gemini-pro)** - Assignment explanations
-- Alternative: Amazon Bedrock, Ollama, HuggingFace Inference API
-
-### Database
-- **SQLite** - Relational database
-- Alternative: PostgreSQL, MySQL
-
-### Core Libraries
-```
-langgraph==0.2.45
-google-generativeai==0.3.2
-pandas==2.1.4
-python-dotenv==1.0.0
-```
-
----
-
-## 📦 Installation
-
-### Prerequisites
-- Python 3.8 or higher
-- pip package manager
-- Google Gemini API key
-
-### Step 1: Clone Repository
-```bash
-git clone <repository-url>
-cd intelligent-work-allocation
-```
-
-### Step 2: Create Virtual Environment
-```bash
-# Windows
-python -m venv .venv
-.venv\Scripts\activate
-
-# Mac/Linux
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-### Step 3: Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### Step 4: Configure API Key
-Create a `.env` file in the project root:
-```env
-GEMINI_API_KEY=your_api_key_here
-```
-
-Get your API key from: https://makersuite.google.com/app/apikey
-
-### Step 5: Setup Database
-The database is automatically created when you run the notebook. CSV data files should be in the `data/` folder:
-```
-data/
-├── resources.csv
-├── resource_calendar.csv
-├── work_requests.csv
-└── specialty_mapping.csv
-```
-
----
-
-## 🚀 Usage
-
-### Running the Notebook
-1. Start Jupyter:
-```bash
-jupyter notebook
-```
-
-2. Open `demo.ipynb`
-
-3. Run cells in order:
-   - Cell 1-2: Import libraries and define state
-   - Cell 3: Database Manager class
-   - Cell 4: Resource Scorer class
-   - Cell 5: Agent node functions
-   - Cell 6: LangGraph workflow
-   - Cell 7: Initialize database
-   - Cells 8-10: Run 3 test scenarios
-
-### Test Scenarios Included
-1. **Urgent Neurological Case** (Priority 5, MRI_Brain)
-2. **Routine Chest X-Ray** (Priority 2, X_Ray_Chest)
-3. **Specialized Mammography** (Priority 3, Mammography - alternate specialty)
-
-### Expected Output
-Each scenario shows:
-- Agent-by-agent workflow execution
-- Candidate scoring details
-- Best resource selection
-- Database updates confirmation
-- AI-generated explanation
-
----
-
-## 🏗️ Architecture
-
-### System Components
-```
-┌─────────────────┐
-│  User Request   │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────────────────────┐
-│       LangGraph Orchestrator        │
-│  ┌───────────────────────────────┐  │
-│  │  Agent 1: AddWorkAgent        │  │
-│  └───────────┬───────────────────┘  │
-│              ▼                       │
-│  ┌───────────────────────────────┐  │
-│  │  Agent 2: WorkAnalyzerAgent   │  │
-│  └───────────┬───────────────────┘  │
-│              ▼                       │
-│  ┌───────────────────────────────┐  │
-│  │  Agent 3: ResourceFinderAgent │  │
-│  └───────────┬───────────────────┘  │
-│              ▼                       │
-│  ┌───────────────────────────────┐  │
-│  │  Agent 4: AvailabilityChecker │  │
-│  └───────────┬───────────────────┘  │
-│              ▼                       │
-│  ┌───────────────────────────────┐  │
-│  │  Agent 5: AssignmentAgent     │  │
-│  └───────────┬───────────────────┘  │
-└──────────────┼──────────────────────┘
-               ▼
-      ┌─────────────────┐
-      │  SQLite Database │
-      └─────────────────┘
-               ▼
-      ┌─────────────────┐
-      │   Gemini API    │
-      └─────────────────┘
-```
-
-### Agent Responsibilities
-
-**Agent 1: AddWorkAgent**
-- Validates input parameters
-- Inserts work request into database
-- Generates unique work_id
-- Returns: work_id
-
-**Agent 2: WorkAnalyzerAgent**
-- Retrieves work request details
-- Determines required specialty from mapping
-- Identifies alternate specialty (if available)
-- Returns: required_specialty, alternate_specialty
-
-**Agent 3: ResourceFinderAgent**
-- Queries resources by specialty
-- Finds primary candidates (exact match)
-- Finds alternate candidates (if needed)
-- Returns: primary_candidates, alternate_candidates
-
-**Agent 4: AvailabilityCheckerAgent**
-- Checks availability for each candidate
-- Calculates 100-point score
-- Ranks candidates by score
-- Returns: best_candidate, all_candidates
-
-**Agent 5: AssignmentAgent**
-- Updates database (work_requests, resources, resource_calendar)
-- Generates AI explanation via Gemini API
-- Returns: final_result with explanation
-
----
-
-## 📊 Scoring Logic
-
-### 100-Point Weighted System
-
-#### Component Breakdown
-
-| Component | Weight | Max Points | Calculation |
-|-----------|--------|------------|-------------|
-| **Skill Level** | 25% | 25 | `(skill_level / 5) × 25` |
-| **Experience** | 20% | 20 | `min(total_cases / 20, 20)` |
-| **Availability** | 30% | 30 | `(hours_available / 8) × 30` |
-| **Workload** | 15% | 15 | `max(0, 15 - workload × 1.5)` |
-| **Priority Bonus** | 10% | 10 | Urgent cases get full 10 pts |
-| **TOTAL** | 100% | 100 | Sum of above |
-
-#### Specialty Multiplier
-- **Exact match:** 1.0× (no penalty)
-- **Alternate match:** 0.8× (20% penalty)
-
-#### Priority Bonus Logic
-```python
-if priority >= 4 and workload <= 2:
-    bonus = 10  # Full bonus for urgent + available
-else:
-    bonus = (priority / 5) × 10  # Scaled bonus
-```
-
-### Example Calculation
-
-**Scenario:** Neurologist with skill=5, 345 cases, 8 hours available, 2 workload, priority=5
-
-```
-Skill:         (5/5) × 25 = 25.00
-Experience:    min(345/20, 20) = 20.00
-Availability:  (8/8) × 30 = 30.00
-Workload:      15 - (2 × 1.5) = 12.00
-Priority:      10.00 (urgent + low workload)
-─────────────────────────────────────
-Subtotal:      97.00
-Multiplier:    1.0 (exact match)
-─────────────────────────────────────
-TOTAL SCORE:   97.00 / 100
-```
-
-### Why These Weights?
-
-**Availability (30%)** - Highest weight because unavailable = can't assign
-
-**Skill Level (25%)** - Critical for quality, especially complex cases
-
-**Experience (20%)** - Proven track record matters
-
-**Workload (15%)** - Balance load but not primary concern
-
-**Priority Bonus (10%)** - Tiebreaker for urgent cases
-
----
-
-## 📁 Project Structure
-
-```
+### Folder Structure
 intelligent-work-allocation/
-├── demo.ipynb                 # Main Jupyter notebook
-├── README.md                  # This file
-├── requirements.txt           # Python dependencies
-├── .env                       # API keys (not in git)
-├── .gitignore                 # Git ignore file
-├── radiology.db               # SQLite database (generated)
 │
-├── data/                      # CSV data files
-│   ├── resources.csv
+├── data/                          # Raw input CSV data files
 │   ├── resource_calendar.csv
-│   ├── work_requests.csv
-│   └── specialty_mapping.csv
+│   ├── resources.csv
+│   ├── specialty_mapping.csv
+│   └── work_requests.csv
 │
-└── diagrams/                  # Architecture diagrams
-    ├── ArchitectureDiagram.png       # System architecture
-    └── SequenceDiagram.jpg           # Sequence diagram
- 
-```
+├── diagrams/                      # Architecture and Sequence diagrams
+│   ├── ArchitectureDiagram.png
+│   └── SequenceDiagram.png
+│
+├── main.ipynb                    # Main jupyter notebook with agents, tools, demonstrations and database manager.
+├── .env                          # Environment variables for DB and APIs
+├── work_allocation.sql           # phpmyadmin SQL dump
+├── docker-compose.yml            # Docker compose to run containers (MySQL, PHPMyAdmin)
+├── requirements.txt              # Python dependencies
+├── README.md                     # Project documentation
+└── .gitignore                    # Git ignore rules
 
----
+### Diagrams
 
-## Conclusion
-This project is for educational purposes as part of the Clovertex GenAI Internship assignment.
+Architecture Diagram:
+Sequence Diagram:
 
----
+## Scoring Logic Rationale
+
+### Base Scoring Framework (100 Points Total)
+Structured the scoring to reflect what matters most in real-world work assignment scenarios:​
+- Role Match (40 points) - Highest-weighted category (specialty alignment directly impacts work quality and safety. A perfect match gets 40 points, while a partially qualified resource (alternate specialty) gets 20 points.)
+- Skill Level (20 points) - Normalized to a 5-point scale (multiplied by 4), this rewards more experienced and capable resources.
+- Experience (15 points) - Measured by total cases handled, capped at 150 cases (15 points max). This balances between fresh talent and veterans.
+- Availability (15 points) - Resources available during the requested work time receive 15 points; those unavailable get 5 points to keep them in consideration for rescheduling scenarios. 
+- Workload (10 points) - Current workload is inversely scored (10 - workload × 2), capped at 0.​
+
+### In case of high Priority (110 points max)
+For high-priority work (≥4), added dynamic scoring adjustments:​
+    - +5 bonus to availability (up to 20 max)
+    - +5 bonus to workload (up to 15 max)
+    - Applied only if workload < 3 and the resource is available
+This ensures urgent cases are assigned to immediately available resources with capacity, rather than those who might be slightly more skilled but overloaded.​
+
+## Demonstration of 3 scenerios
+Can check details of 'assignment_log' table in work_allocation.sql (phpmyadmin SQL dump) for the 3 scenerios.
+
+### Scenerio 1: Urgent MRI_Brain Case (Priority 5)
+LLM Reasoning: Dr. Sarah Chen (R005) is the best match for work W023 with a score of 94, demonstrating an exceptional fit based on her specialty as a Neurologist, high skill level, and extensive experience. Her high availability and perfect role match, alongside a reasonable current workload, further solidify this assignment, despite a moderate workload score.
+
+### Scenario 2: Routine Ultrasound_Abdomen (Priority 2)
+LLM Reasoning: Dr. John Smith (R001) is the best match for work W024 with a score of 92, driven by a perfect role match as a General Radiologist, high skill level, and extensive experience. His good availability and manageable current workload further solidify this optimal assignment.
+
+### Scenario 3: Specialized X_Ray_Bone (Priority 3)
+LLM Reasoning:  Dr. David Lee (R012) is the best match for work W025 with a score of 86, largely due to his perfect role match as a Musculoskeletal Specialist, high skill level, and extensive experience. Although his availability score is lower, his strong performance in other critical areas makes him the most suitable candidate for this specialized x-ray.
+
+## Screenshots
+These are the screenshots of phpmyadmin, docker containers working, the outputs from demonstrations.
