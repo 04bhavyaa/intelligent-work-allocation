@@ -127,8 +127,8 @@ LLM Reasoning:  Dr. David Lee (R012) is the best match for work W025 with a scor
 
 ## Screenshots
 These are the screenshots of phpmyadmin, docker containers working, the outputs from demonstrations.
-<img width="1572" height="892" alt="Screenshot 2025-11-19 151552" src="https://github.com/user-attachments/assets/cf850e61-195d-414d-9e0d-095196caa847" />
-<img width="1470" height="275" alt="Screenshot 2025-11-19 151625" src="https://github.com/user-attachments/assets/70825bd0-b2f7-4eb3-bd5c-bb8993a457f0" />
+<img width="1572" height="892" alt="Screenshot 2025-11-19 151552" src="https://github.com/user-attachments/assets/c42a6570-6a21-446f-9b81-926e77e57db6" />
+<img width="1470" height="225" alt="Screenshot 2025-11-19 151625" src="https://github.com/user-attachments/assets/5789b2f5-4dbb-408f-a93d-a18edd1efdf5" />
 <img width="1358" height="657" alt="Screenshot 2025-11-20 003038" src="https://github.com/user-attachments/assets/0cb017b8-6864-4cb0-a273-f6440e93778b" />
 <img width="1355" height="690" alt="Screenshot 2025-11-20 003049" src="https://github.com/user-attachments/assets/b79480b1-ef2d-48b9-a10d-63efc5880a67" />
 <img width="1354" height="713" alt="Screenshot 2025-11-20 003059" src="https://github.com/user-attachments/assets/f0e7bd86-8e9b-4fc3-9aa9-6745f092ddb9" />
