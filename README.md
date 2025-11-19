@@ -25,22 +25,22 @@ Then, upon finishing that tried this approach and in the process learnt Strands 
 - Run notebook `demo.ipynb` using the virtual environment kernel for full demonstration.
 
 **Sample .env**
-- Gemini
-    - GOOGLE_API_KEY=
-    - GEMINI_MODEL=gemini-2.5-flash (I used this model.)
-
-- Bedrock
-    - AWS_ACCESS_KEY_ID=
-    - AWS_SECRET_ACCESS_KEY=
-    - AWS_DEFAULT_REGION=
-    - BEDROCK_MODEL_ID=anthropic.claude-3-sonnet-20240229-v1:0
-
-- MySQL Database
-    - DB_HOST=localhost
-    - DB_PORT=3307
-    - DB_NAME=work_allocation
-    - DB_USER=work_user
-    - DB_PASSWORD=work_password
+```
+# Gemini
+GOOGLE_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash (I used this model.)
+# Bedrock
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=
+BEDROCK_MODEL_ID=anthropic.claude-3-sonnet-20240229-v1:0
+# MySQL Database
+DB_HOST=localhost
+DB_PORT=3307
+DB_NAME=work_allocation
+DB_USER=work_user
+DB_PASSWORD=work_password
+```
 
 ## Design Decisions and Trade-offs
 
@@ -68,6 +68,7 @@ Then, upon finishing that tried this approach and in the process learnt Strands 
 - For system_prompts in Strands Agents used to the point and short prompts and instructed the LLM to avoid providing any reasoning for the actions taken, to avoid token usage.
 
 ### Folder Structure
+```
 intelligent-work-allocation/
 │
 ├── data/                          # Raw input CSV data files
@@ -87,11 +88,13 @@ intelligent-work-allocation/
 ├── requirements.txt              # Python dependencies
 ├── README.md                     # Project documentation
 └── .gitignore                    # Git ignore rules
-
+```
 ### Diagrams
 
 Architecture Diagram:
+<img width="3803" height="1460" alt="ArchitectureDiagram" src="https://github.com/user-attachments/assets/0086b74e-689f-4863-9a76-be2e6b7ba26f" />
 Sequence Diagram:
+<img width="4190" height="1650" alt="SequenceDiagram" src="https://github.com/user-attachments/assets/120a96af-5970-430d-8b03-8d186349d135" />
 
 ## Scoring Logic Rationale
 
@@ -124,3 +127,10 @@ LLM Reasoning:  Dr. David Lee (R012) is the best match for work W025 with a scor
 
 ## Screenshots
 These are the screenshots of phpmyadmin, docker containers working, the outputs from demonstrations.
+<img width="1572" height="892" alt="Screenshot 2025-11-19 151552" src="https://github.com/user-attachments/assets/cf850e61-195d-414d-9e0d-095196caa847" />
+<img width="1470" height="275" alt="Screenshot 2025-11-19 151625" src="https://github.com/user-attachments/assets/70825bd0-b2f7-4eb3-bd5c-bb8993a457f0" />
+<img width="1358" height="657" alt="Screenshot 2025-11-20 003038" src="https://github.com/user-attachments/assets/0cb017b8-6864-4cb0-a273-f6440e93778b" />
+<img width="1355" height="690" alt="Screenshot 2025-11-20 003049" src="https://github.com/user-attachments/assets/b79480b1-ef2d-48b9-a10d-63efc5880a67" />
+<img width="1354" height="713" alt="Screenshot 2025-11-20 003059" src="https://github.com/user-attachments/assets/f0e7bd86-8e9b-4fc3-9aa9-6745f092ddb9" />
+<img width="1373" height="113" alt="Screenshot 2025-11-19 235546" src="https://github.com/user-attachments/assets/759ccfab-0b92-4e8f-8455-14f81a1c5bfd" />
+<img width="1919" height="876" alt="Screenshot 2025-11-19 235519" src="https://github.com/user-attachments/assets/f1659e60-c983-4a9d-8335-20d25ea68e47" />
